@@ -48,3 +48,12 @@ app.*.map.json
 /android/key.properties
 /android/featherdash.jks
 /android/featherdash.jks.old
+
+# Firebase service account — keep out of git, it carries the project id
+/android/app/google-services.json
+
+# Plain-text secrets that `tool/encode_keys.dart` accepts as input.
+# The compiled scrambled bytes live in lib/setup/*.dart — never the
+# plain values. Optional: also gitignore the tool itself if your CI
+# rebuilds the tables, otherwise keep it but wipe the constants
+# before committing.

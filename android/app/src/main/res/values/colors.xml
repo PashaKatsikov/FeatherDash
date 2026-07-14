@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#F4B23E</color>
+    <color name="ic_launcher_background">#1B2A4A</color>
+    <!-- Matches FD.navy used by the BootGate scaffold so the first
+         Android-painted frame doesn't clash with the first Flutter frame. -->
+    <color name="launch_bg">#1B2A4A</color>
 </resources>

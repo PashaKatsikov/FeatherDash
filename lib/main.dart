@@ -1,19 +1,84 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'game_data.dart';
-import 'screens/loading_screen.dart';
+import 'gray/boot_gate.dart';
+import 'network/attribution_engine.dart';
+import 'network/backend_client.dart';
+import 'network/browser_http.dart';
+import 'network/network_monitor.dart';
+import 'platform/local_store.dart';
+import 'platform/push_channel.dart';
 
 late GameState gameState;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase + App Check come first so background isolates can attach
+  // to them. Both wrapped in try/catch — the game still has to run if
+  // google-services.json is missing.
+  try {
+    await Firebase.initializeApp();
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: kDebugMode
+          ? AndroidProvider.debug
+          : AndroidProvider.playIntegrity,
+    );
+  } catch (_) {}
+
+  await SystemChrome.setPreferredOrientations(const [
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+  ));
+
+  // Build the gray-flow service graph. All long-lived singletons live
+  // here so the BootGate widget never has to construct them.
+  await browserHttp.warmUp();
+  final store = LocalStore();
+  await store.warmUp();
+  final monitor = NetworkMonitor();
+  final attribution = AttributionEngine();
+  final backend = BackendClient(store);
+  final push = PushChannel(store);
+
+  // Game state is the existing arcade's persistent progress. It's
+  // loaded eagerly so MenuScreen has no first-frame jank.
   gameState = await GameState.load();
-  runApp(const FeatherDashApp());
+
+  runApp(FeatherDashApp(
+    store: store,
+    monitor: monitor,
+    attribution: attribution,
+    backend: backend,
+    push: push,
+  ));
 }
 
 class FeatherDashApp extends StatelessWidget {
-  const FeatherDashApp({super.key});
+  final LocalStore store;
+  final NetworkMonitor monitor;
+  final AttributionEngine attribution;
+  final BackendClient backend;
+  final PushChannel push;
+
+  const FeatherDashApp({
+    super.key,
+    required this.store,
+    required this.monitor,
+    required this.attribution,
+    required this.backend,
+    required this.push,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +94,13 @@ class FeatherDashApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFF1B2A4A),
       ),
-      home: const LoadingScreen(),
+      home: BootGate(
+        store: store,
+        monitor: monitor,
+        attribution: attribution,
+        backend: backend,
+        push: push,
+      ),
     );
   }
 }

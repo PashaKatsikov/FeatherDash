@@ -2,18 +2,35 @@ name: featherdash
 description: "Feather Dash - chicken basketball game."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+10
 
 environment:
-  sdk: ^3.12.2
+  sdk: ^3.11.4
 
 dependencies:
   flutter:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  shared_preferences: ^2.3.2
-  webview_flutter: ^4.10.0
+  shared_preferences: ^2.5.3
+  webview_flutter: ^4.13.1
+  webview_flutter_android: ^4.11.0
+  http: ^1.4.0
+  url_launcher: ^6.3.2
+  connectivity_plus: ^6.1.0
+  device_info_plus: ^11.3.0
+  package_info_plus: ^8.3.0
+  flutter_secure_storage: ^9.2.4
+  # PINNED. Do NOT upgrade to 10.x+ — those releases are Kotlin-only
+  # and ship their own Kotlin Gradle Plugin that clashes with Flutter's
+  # built-in Kotlin support, breaking `GeneratedPluginRegistrant.java`.
+  # See `.cursor/rules/gray_part_pitfalls.md` §1.
+  file_picker: 8.1.4
+  appsflyer_sdk: ^6.15.0
+  firebase_core: ^3.12.0
+  firebase_messaging: ^15.2.0
+  firebase_app_check: ^0.3.2+5
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:
@@ -26,9 +43,14 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/icon.png"
-  adaptive_icon_background: "#F4B23E"
+  # Dark navy frame — complements the warm tones in the chicken art
+  # and makes the icon read clearly against light home-screen wallpapers.
+  adaptive_icon_background: "#1B2A4A"
   adaptive_icon_foreground: "assets/icon.png"
-  adaptive_icon_foreground_inset: 0
+  # 18% inset keeps the foreground entirely inside Android's 66dp safe
+  # zone of the 108dp adaptive canvas, so no part of the chicken is
+  # clipped by circular / squircle / teardrop launcher masks.
+  adaptive_icon_foreground_inset: 18
   min_sdk_android: 21
 
 flutter:
@@ -60,3 +82,7 @@ flutter:
     - assets/exploded_chicken_skin.webp
     - assets/exploded_chicken_skin2.webp
     - assets/exploded_chicken_skin3.webp
+    - assets/additional_assets/notifications_horizantal.webp
+    - assets/additional_assets/notifications_portrait.webp
+    - assets/additional_assets/nowifi_horizontal.webp
+    - assets/additional_assets/nowifi_portrait.webp
