@@ -2,7 +2,7 @@ name: featherdash
 description: "Feather Dash - chicken basketball game."
 publish_to: 'none'
 
-version: 1.0.1+10
+version: 1.0.1+11
 
 environment:
   sdk: ^3.11.4
